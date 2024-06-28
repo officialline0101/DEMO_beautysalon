@@ -48,7 +48,7 @@
             gap: 10px;
             margin-bottom: 20px;
         }
-        .visit-buttons button, .symptoms button {
+        .visit-buttons button, .symptoms button, .other-symptoms button {
             flex: 1;
             padding: 10px;
             border: 1px solid #ccc;
@@ -59,7 +59,7 @@
             text-align: center;
             white-space: nowrap;
         }
-        .visit-buttons button.active, .symptoms button.active {
+        .visit-buttons button.active, .symptoms button.active, .other-symptoms button.active {
             background-color: #444;
             color: #fff;
         }
@@ -92,26 +92,40 @@
         <label for="phone">電話番号※必須</label>
         <input type="tel" id="phone" placeholder="電話番号を入力してください">
 
-        <label>ご来店回数※必須</label>
+        <label>ご来店回数※任意</label>
         <div class="visit-buttons">
             <button type="button" id="firstVisit" onclick="selectVisit(this)">初めて</button>
             <button type="button" id="repeatVisit" onclick="selectVisit(this)">2回目以降</button>
         </div>
 
-        <label>症状※必須</label>
+        <label>コース※必須</label>
         <div class="symptoms">
-            <button type="button" onclick="selectSymptom(this)">頭痛・偏頭痛</button>
-            <button type="button" onclick="selectSymptom(this)">交通事故施術</button>
-            <button type="button" onclick="selectSymptom(this)">肩こり・腕のしびれ</button>
-            <button type="button" onclick="selectSymptom(this)">臀部・下肢の痛みや痒れ</button>
-            <button type="button" onclick="selectSymptom(this)">ぎっくり腰・慢性腰痛</button>
-            <button type="button" onclick="selectSymptom(this)">寝違い・むち打ち等首の症状</button>
-            <button type="button" onclick="selectSymptom(this)">EMS(電気的筋肉刺激装置)トレーニング</button>
-            <button type="button" onclick="selectSymptom(this)">健康保険の施術</button>
-            <button type="button" onclick="selectSymptom(this)">その他</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
+            <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
         </div>
 
-        <label for="date1">第1希望日※必須</label>
+        <label>症状（複数選択可能）</label>
+        <div class="other-symptoms">
+            <button type="button" onclick="toggleOtherSymptom(this)">腰が痛い</button>
+            <button type="button" onclick="toggleOtherSymptom(this)">肩が痛い</button>
+            <button type="button" onclick="toggleOtherSymptom(this)">首が痛い</button>
+            <button type="button" onclick="toggleOtherSymptom(this)">手首の痛み</button>
+            <button type="button" onclick="toggleOtherSymptom(this)">癒しが欲しい</button>
+            <button type="button" onclick="toggleOtherSymptom(this)">疲れが溜まっている</button>
+            <button type="button" onclick="toggleOtherSymptom(this)">身体の歪み</button>
+            <button type="button" onclick="toggleOtherSymptom(this)">猫背</button>
+            <button type="button" onclick="toggleOtherSymptom(this)">その他</button>
+            <!-- 他の症状ボタンも同様に追加 -->
+        </div>
+
+        <label for="date1">第1希望日※必須<br>定休日【日】<br>希望時間は00分or30分でお願いします。</label>
         <input type="datetime-local" id="date1" placeholder="タップして日時を入力">
 
         <label for="date2">第2希望日</label>
@@ -129,7 +143,8 @@
     <script src="https://static.line-scdn.net/liff/edge/2.1/sdk.js"></script>
     <script>
         let visitCount = '';
-        let symptoms = [];
+        let selectedSymptom = '';
+        let selectedOtherSymptoms = []; // 選択されたその他の症状を保存する配列
 
         // LIFF初期化
         document.addEventListener('DOMContentLoaded', function() {
@@ -152,12 +167,24 @@
         }
 
         function selectSymptom(element) {
-            element.classList.toggle('active');
-            const symptom = element.innerText;
-            if (symptoms.includes(symptom)) {
-                symptoms = symptoms.filter(s => s !== symptom);
+            const allSymptoms = document.querySelectorAll('.symptoms button');
+            allSymptoms.forEach(symptom => {
+                symptom.classList.remove('active');
+            });
+            element.classList.add('active');
+            selectedSymptom = element.innerText;
+        }
+
+        function toggleOtherSymptom(element) {
+            element.classList.toggle('active'); // ボタンの状態を切り替える
+
+            if (element.classList.contains('active')) {
+                selectedOtherSymptoms.push(element.innerText); // ボタンが選択されたら配列に追加
             } else {
-                symptoms.push(symptom);
+                const index = selectedOtherSymptoms.indexOf(element.innerText);
+                if (index !== -1) {
+                    selectedOtherSymptoms.splice(index, 1); // ボタンが選択解除されたら配列から削除
+                }
             }
         }
 
@@ -173,7 +200,8 @@
                 name,
                 phone,
                 visitCount,
-                symptoms,
+                symptoms: selectedSymptom, // 通常の症状
+                otherSymptoms: selectedOtherSymptoms, // その他の症状
                 dates: [date1, date2, date3],
                 message
             };
@@ -181,7 +209,7 @@
             // LINEトークにメッセージを送信
             liff.sendMessages([{
                 type: 'text',
-                text: `【予約フォーム】\nお名前：${formData.name}\n電話番号：${formData.phone}\n訪問回数：${formData.visitCount}\n症状：${formData.symptoms.join(', ')}\n希望日時：\n ${formData.dates[0]}\n${formData.dates[1]}\n${formData.dates[2]}\nメッセージ：${formData.message}`
+                text: `【予約フォーム】\nお名前：${formData.name}\n電話番号：${formData.phone}\n訪問回数：${formData.visitCount}\nコース：${formData.symptoms}\n症状：${formData.otherSymptoms.join(', ')}\n希望日時：\n ${formData.dates[0]}\n${formData.dates[1]}\n${formData.dates[2]}\nメッセージ：${formData.message}`
             }]).then(() => {
                 alert('当日キャンセルは無いようにお願いいたします。キャンセル料発生いたします。 ' );
                 // LIFFウィンドウを閉じる
