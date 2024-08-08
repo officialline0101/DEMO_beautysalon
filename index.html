@@ -330,26 +330,6 @@
             fetchAvailability(currentDate);
         });
 
-        function selectVisit(element) {
-            /* 訪問回数ボタンの選択状態をリセット */
-            document.getElementById('firstVisit').classList.remove('active');
-            document.getElementById('repeatVisit').classList.remove('active');
-            /* クリックされたボタンを選択状態にする */
-            element.classList.add('active');
-            /* 選択された訪問回数を変数に格納 */
-            visitCount = element.innerText;
-        }
-
-        function selectirradiations(element) {
-            /* 訪問回数ボタンの選択状態をリセット */
-            document.getElementById('firstirradiations').classList.remove('active');
-            document.getElementById('repeatirradiations').classList.remove('active');
-            /* クリックされたボタンを選択状態にする */
-            element.classList.add('active');
-            /* 選択された訪問回数を変数に格納 */
-            irradiationsCount = element.innerText;
-        }
-
         function selectVisit(button) {
             const buttons = document.querySelectorAll('.visit-buttons button');
             buttons.forEach(btn => btn.classList.remove('active'));
@@ -369,18 +349,6 @@
                 section.classList.remove('active');
             });
             document.getElementById(menu).classList.add('active');
-        }
-
-        function selectSymptom(element) {
-            /* 全ての症状ボタンの選択状態をリセット */
-            const allSymptoms = document.querySelectorAll('.symptoms button');
-            allSymptoms.forEach(symptom => {
-                symptom.classList.remove('active');
-            });
-            /* クリックされたボタンを選択状態にする */
-            element.classList.add('active');
-            /* 選択された症状を変数に格納 */
-            selectedSymptom = element.innerText;
         }
 
         function toggleOtherSymptom(element) {
