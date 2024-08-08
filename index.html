@@ -55,7 +55,7 @@
             gap: 10px;
             margin-bottom: 20px;
         }
-        .visit-buttons button, .symptoms button, .menu-sections button, .irradiations button, .other-symptoms button  {
+        .visit-buttons button, .symptoms button, .menu-sections button, .irradiations button {
             flex: 1;
             padding: 10px;
             border: 1px solid #ccc;
@@ -66,7 +66,7 @@
             text-align: center;
             white-space: nowrap;
         }
-        .visit-buttons button.active, .symptoms button.active, .menu-sections button.active, .irradiations button.active, .other-symptoms button.active  {
+        .visit-buttons button.active, .symptoms button.active, .menu-sections button.active, .irradiations button.active {
             background-color: #444;
             color: #fff;
         }
@@ -197,16 +197,16 @@
             <button type="button" id="repeatVisit" onclick="selectVisit(this)">2回目以降</button>
         </div>
 
-        <div class="label">コースをお選びください</div>
+        <label>メニューをお選びください</label>
         <div class="menu-sections">
             <button type="button" onclick="showMenu('male')">脱毛男性限定</button>
             <button type="button" onclick="showMenu('female')">脱毛女性限定</button>
-            <button type="button" onclick="showMenu('eyebrow')">眉毛コース</button>
-            <button type="button" onclick="showMenu('whitening')">ホワイトニングコース</button>
+            <button type="button" onclick="showMenu('eyebrow')">眉毛メニュー</button>
+            <button type="button" onclick="showMenu('whitening')">ホワイトニングメニュー</button>
         </div>
 
         <div id="male" class="menu-section">
-            <label>◆脱毛コース◆<br><br>---男性限定---</label>
+            <label>◆脱毛メニュー◆<br><br>---男性限定---</label>
             <div class="symptoms">
                 <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
                 <button type="button" onclick="selectSymptom(this)">コースA(20分)</button>
@@ -216,7 +216,7 @@
         </div>
 
         <div id="female" class="menu-section">
-            <label>◆脱毛コース◆<br><br>---女性限定---</label>
+            <label>◆脱毛メニュー◆<br><br>---女性限定---</label>
             <div class="symptoms">
                 <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
                 <button type="button" onclick="selectSymptom(this)">コースA(20分)</button>
@@ -230,22 +230,8 @@
             </div>
         </div>
 
-        <label>症状（複数選択可能）</label>
-        <div class="other-symptoms">
-            <button type="button" onclick="toggleOtherSymptom(this)">腰が痛い</button>
-            <button type="button" onclick="toggleOtherSymptom(this)">肩が痛い</button>
-            <button type="button" onclick="toggleOtherSymptom(this)">首が痛い</button>
-            <button type="button" onclick="toggleOtherSymptom(this)">手首の痛み</button>
-            <button type="button" onclick="toggleOtherSymptom(this)">癒しが欲しい</button>
-            <button type="button" onclick="toggleOtherSymptom(this)">疲れが溜まっている</button>
-            <button type="button" onclick="toggleOtherSymptom(this)">身体の歪み</button>
-            <button type="button" onclick="toggleOtherSymptom(this)">猫背</button>
-            <button type="button" onclick="toggleOtherSymptom(this)">その他</button>
-            <!-- 他の症状ボタンも同様に追加 -->
-        </div>
-
         <div id="eyebrow" class="menu-section">
-            <label>◆眉毛コース◆</label>
+            <label>◆眉毛メニュー◆</label>
             <div class="symptoms">
                 <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
                 <button type="button" onclick="selectSymptom(this)">コースA(20分)</button>
@@ -257,7 +243,7 @@
         </div>
 
         <div id="whitening" class="menu-section">
-            <label>◆ホワイトニングコース◆</label>
+            <label>◆ホワイトニングメニュー◆</label>
             <div class="symptoms">
                 <button type="button" onclick="selectSymptom(this)">コースA(10分)</button>
                 <button type="button" onclick="selectSymptom(this)">コースA(20分)</button>
@@ -316,11 +302,10 @@
         let currentDate = new Date();
         let availabilityCache = {};
         let irradiationsCount = ''; <!-- 選択された症状を格納する変数 -->
-        let selectedOtherSymptoms = []; // 選択されたその他の症状を保存する配列
 
         document.addEventListener('DOMContentLoaded', function() {
             liff.init({
-                liffId: '2004727608-aZejr9x5'
+                liffId: '2005254357-zKma9BZk'
             }).then(() => {
                 console.log('LIFF初期化成功');
             }).catch((err) => {
@@ -329,6 +314,26 @@
 
             fetchAvailability(currentDate);
         });
+
+        function selectVisit(element) {
+            /* 訪問回数ボタンの選択状態をリセット */
+            document.getElementById('firstVisit').classList.remove('active');
+            document.getElementById('repeatVisit').classList.remove('active');
+            /* クリックされたボタンを選択状態にする */
+            element.classList.add('active');
+            /* 選択された訪問回数を変数に格納 */
+            visitCount = element.innerText;
+        }
+
+        function selectirradiations(element) {
+            /* 訪問回数ボタンの選択状態をリセット */
+            document.getElementById('firstirradiations').classList.remove('active');
+            document.getElementById('repeatirradiations').classList.remove('active');
+            /* クリックされたボタンを選択状態にする */
+            element.classList.add('active');
+            /* 選択された訪問回数を変数に格納 */
+            irradiationsCount = element.innerText;
+        }
 
         function selectVisit(button) {
             const buttons = document.querySelectorAll('.visit-buttons button');
@@ -351,17 +356,16 @@
             document.getElementById(menu).classList.add('active');
         }
 
-        function toggleOtherSymptom(element) {
-            element.classList.toggle('active'); // ボタンの状態を切り替える
-
-            if (element.classList.contains('active')) {
-                selectedOtherSymptoms.push(element.innerText); // ボタンが選択されたら配列に追加
-            } else {
-                const index = selectedOtherSymptoms.indexOf(element.innerText);
-                if (index !== -1) {
-                    selectedOtherSymptoms.splice(index, 1); // ボタンが選択解除されたら配列から削除
-                }
-            }
+        function selectSymptom(element) {
+            /* 全ての症状ボタンの選択状態をリセット */
+            const allSymptoms = document.querySelectorAll('.symptoms button');
+            allSymptoms.forEach(symptom => {
+                symptom.classList.remove('active');
+            });
+            /* クリックされたボタンを選択状態にする */
+            element.classList.add('active');
+            /* 選択された症状を変数に格納 */
+            selectedSymptom = element.innerText;
         }
 
 function selectDate(cell) {
@@ -390,16 +394,6 @@ function selectDate(cell) {
                 message: document.getElementById('message').value
             };
 
-            const formData = {
-                name,
-                phone,
-                visitCount,
-                symptoms: selectedSymptom, // 通常の症状
-                otherSymptoms: selectedOtherSymptoms, // その他の症状
-                dates: [date1, date2, date3],
-                message
-            };
-
 // フォームデータのチェック
 if (!formData.name || !formData.phone || !formData.visitCount) {
     alert('お名前・電話番号・ご来店回数すべてご記入ください。');
@@ -409,7 +403,7 @@ if (!formData.name || !formData.phone || !formData.visitCount) {
             // LINEトークにメッセージを送信
             liff.sendMessages([{
                 type: 'text',
-                text: `【予約フォーム】\nお名前：${formData.name}\n電話番号：${formData.phone}\nご来店回数：${formData.visitCount}\nコース：${formData.selectedSymptom}\n症状：${formData.otherSymptoms.join(', ')}\n希望日時：\n ${formData.dates[0]}\nメッセージ：${formData.message}`
+                text: `【予約フォーム】\nお名前：${formData.name}\n電話番号：${formData.phone}\nご来店回数：${formData.visitCount}\nメニュー：${formData.selectedSymptom}\n希望日時：\n ${formData.dates[0]}\nメッセージ：${formData.message}`
             }]).then(() => {
                 /* メッセージ送信成功時の処理 */
                 alert('当日キャンセルは無いようにお願いいたします。キャンセル料発生いたします。');
